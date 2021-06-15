@@ -39,16 +39,16 @@ class DivElement extends OwnDomElement {
             div.appendChild(document.createTextNode(""))
 
           }else{
-           
-            for(let i =0; i<children.length; i++){
 
-              div.appendChild(children[i])
+            for(let i =0; i<children.length; i++){
+            
+               div.appendChild(children[i].draw())
 
             }
 
             if( children.length === undefined ) {
 
-              div.appendChild(children)
+              div.appendChild(children.draw())
 
             }
 
@@ -64,12 +64,11 @@ class DivElement extends OwnDomElement {
 const el = (type, attributes, children) => {
 
     const element = new DivElement(type,attributes,children);
-    const res = element.draw();
 
-    return res;
+    return element;
   }
-  
-  const tree = el("form", {action: '/some_action'}, [
+
+  const tree =  el("form", {action: '/some_action'}, [
     el("label", {for: 'name'}, "First name:"),
     el("br", {}, null),
     el("input", {type: 'text', id: 'name', name: 'name', value: "My name"}, null),
@@ -81,6 +80,22 @@ const el = (type, attributes, children) => {
     el("input", {type: 'submit', value: "Submit"}, null),
   ]);
 
-
-  document.getElementById("root").appendChild(tree);
+  document.getElementById("root").appendChild(tree.draw());
  
+  const tree2 =
+  el("div", {},
+    el("ul", {}, [
+      el("li", {}, "Item 1"),
+      el("li", {}, "Item 2"),
+      el("li", {}, "Item 3")
+    ])
+  );
+
+  document.getElementById("root").appendChild(tree2.draw());
+ 
+  const tree3 =
+  el("div", {"class": "some_classname", "id": "some_id"},
+    el("span", {}, 'hello')
+  );
+
+  document.getElementById("root").appendChild(tree3.draw());
