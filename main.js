@@ -13,7 +13,6 @@ class OldDomeElement {
   }
 
 }
-
 class OwnDomElement {
     
     constructor(obj) {
@@ -26,6 +25,7 @@ class OwnDomElement {
 
     }
 }
+
 class OldDivElement extends OldDomeElement {
 
   OldDraw = () => {
@@ -66,11 +66,12 @@ class OldDivElement extends OldDomeElement {
 
             }
           }
-      })
+      }) 
 
       return div;
-  }
+  } 
 }
+
 class DivElement extends OwnDomElement {
 
   draw = () => {
@@ -117,7 +118,7 @@ class DivElement extends OwnDomElement {
 
 }
 
-  const el = (type, attributes, children) => {
+  const el = ( type = "div", attributes = {}, children = [] ) => {
 
       const element = new OldDivElement(type,attributes,children);
 
@@ -237,11 +238,417 @@ class DivElement extends OwnDomElement {
         },
         {
           type:"input",
-          attributes:{type: 'submit', value: "Submit"},
+          attributes:{type: 'submit', string: "Submit"},
           value:null
         },
       ]
     }
   }
+
   const treeobj = new DivElement(obj3);
+
   document.getElementById("root").appendChild(treeobj.draw());
+
+  // New Version 
+  
+  const tagType = ( Itemtype = "", domObj = {}, parent = null ,index = 0) => {
+
+    const { type , attributes, children } = domObj;
+
+    switch(Itemtype){
+      case "div":
+
+        if(parent === null){
+        
+          domObj = new DivElem(type,attributes,children);
+
+        }else {
+
+          parent.children[index] = new DivElem(type,attributes,children);
+
+        }
+        break;
+      case "span":
+
+        if(parent === null){
+
+          domObj = new SpanElem(type,attributes,children);
+
+        }else {
+
+          parent.children[index] = new SpanElem(type,attributes,children);
+
+        }
+        break;  
+      case "ul":
+
+        if(parent === null){
+
+          domObj = new UlElem(type,attributes,children);
+
+        }else {
+
+          parent.children[index] = new UlElem(type,attributes,children);
+
+        }
+        break;  
+      case "li":
+
+        if(parent === null){
+
+          domObj = new LiElem(type,attributes,children);
+
+        }else {
+
+          parent.children[index] = new LiElem(type,attributes,children);
+
+        }
+        break;  
+      case "form":
+
+        if(parent === null){
+
+          domObj = new FormElem(type,attributes,children);
+
+        }else {
+
+          parent.children[index] = new FormElem(type,attributes,children);
+
+        }
+        break; 
+        case "input":
+
+          if(parent === null){
+
+            domObj = new InputElem(type,attributes,children);
+
+          }else {
+
+            parent.children[index] = new InputElem(type,attributes,children);
+
+          }
+          break; 
+      case "label":
+
+        if(parent === null){
+
+          domObj = new LabelElem(type,attributes,children);
+
+        }else {
+
+          parent.children[index] = new LabelElem(type,attributes,children);
+
+        }
+        break;  
+        case "br":
+
+          if(parent === null){
+
+            domObj = new BrElem(type,attributes,children);
+
+          }else {
+
+            parent.children[index] = new BrElem(type,attributes,children);
+
+          }
+          break; 
+    }
+    return domObj
+  }
+
+
+  const elFactory = ( objectTag = {} ) => {
+        
+      const tag = objectTag.draw();
+
+      const dom = (el) => {
+
+        if( el.children !== undefined ) {
+          
+          el.children.map(dom);
+        }
+
+        tag.appendChild(el.draw());
+      
+      }
+
+      if( objectTag.children !== undefined ){
+
+      objectTag.children.map(dom);
+
+      }
+
+    return tag;
+
+  }
+
+
+
+
+  const newtree = (obj, parent = null , index = 0) => {
+    let res;
+    let domObj = obj.hasOwnProperty('div') ? obj.div : obj; 
+   
+      for (let i in domObj) {
+
+        if ( domObj[i] !== null && typeof domObj[i] =="object"  && i === "children") { 
+
+
+          newtree(domObj.children[index], domObj, index);
+
+        } else {
+
+          const { type , attributes, children } = domObj;
+
+          if(parent !== null){
+
+            parent.children.map((el,index) => {
+             
+              res = tagType(el.type,parent.children[index],parent,index++);
+
+            })
+
+          }else {
+
+            res =  tagType(type,domObj,parent,index);
+
+          }
+
+        }
+      }
+
+      return res;
+  }
+
+  class NewDomeElement {
+
+    constructor( tagtype = "div", attributes = {} , children = []) {
+  
+      this.tagtype = tagtype;
+      this.attributes = attributes;
+      this.children = children;
+  
+    } 
+  
+    draw = () => {
+  
+    }
+  
+  }
+
+
+  class DivElem extends NewDomeElement {
+
+      draw = () => {
+        
+      const tag = document.createElement(this.tagtype);
+
+      for (let key in this.attributes) {
+        
+        tag.setAttribute(key, this.attributes[key])
+
+      }
+
+      if(this.children != undefined){
+        
+        this.children.map(el => {
+    
+          tag.appendChild(elFactory(el))
+
+        })
+      }
+
+      return tag;
+
+      }
+  }
+
+  class InputElem extends NewDomeElement {
+
+    draw = () => {
+
+      const tag = document.createElement(this.tagtype);
+        
+        for (let key in this.attributes) {
+          
+          tag.setAttribute(key, this.attributes[key])
+    
+        }
+        if(this.children != undefined){
+          
+          this.children.map(el => {
+          
+            tag.appendChild(elFactory(el))
+
+          })
+        }
+
+      return  tag;
+
+    }
+
+  }
+  
+  class UlElem extends NewDomeElement {
+
+      draw = () => {
+
+        const tag = document.createElement(this.tagtype);
+          
+          for (let key in this.attributes) {
+            
+            tag.setAttribute(key, this.attributes[key])
+              
+          }
+          if(this.children != undefined){
+            
+            this.children.map(el => {
+            
+              tag.appendChild(elFactory(el))
+          
+            })
+          }
+
+        return tag;
+
+      }
+  }
+
+  class LiElem extends NewDomeElement {
+
+      draw = () => {
+
+        const tag = document.createElement(this.tagtype);
+
+          for (let key in this.attributes) {
+            
+            tag.setAttribute(key, this.attributes[key])
+      
+          }
+    
+          if(this.children != undefined){
+            
+            this.children.map(el => {
+            
+            tag.appendChild(elFactory(el))
+
+            })
+
+          }
+    
+      return  tag;
+
+      }
+  }
+  
+  class FormElem extends NewDomeElement {
+
+    draw = () => {
+
+      const tag = document.createElement(this.tagtype);
+
+        for (let key in this.attributes) {
+        
+          tag.setAttribute(key, this.attributes[key])
+  
+        }
+
+        if(this.children != undefined){
+              
+            this.children.map(el => {
+
+            tag.appendChild(elFactory(el))
+
+            })
+        }
+
+        return  tag;
+
+      }
+
+  }
+
+  class BrElem extends NewDomeElement {
+
+    draw = () => {
+
+      const tag = document.createElement(this.tagtype);
+
+      for (let key in this.attributes) {
+       
+       tag.setAttribute(key, this.attributes[key])
+ 
+      }
+  
+      if(this.children != undefined){
+          
+        this.children.map(el => {
+        
+          tag.appendChild(elFactory(el))
+       
+        })
+      }
+    
+      return  tag;
+
+    }
+
+  }
+  
+  class SpanElem extends NewDomeElement {
+
+    draw = () => {
+      
+      const tag = document.createElement(this.tagtype);
+
+      for (let key in this.attributes) {
+       
+       tag.setAttribute(key, this.attributes[key])
+ 
+      }
+
+      if(this.children != undefined){
+            
+        this.children.map(el => {
+
+          tag.appendChild(elFactory(el))
+
+        })
+      }
+      
+      return  tag;
+
+    }
+
+  }
+  class LabelElem extends NewDomeElement {
+
+    draw = () => {
+
+      const tag = document.createElement(this.tagtype);
+
+      for (let key in this.attributes) {
+       
+       tag.setAttribute(key, this.attributes[key])
+ 
+      }
+  
+      if(this.children != undefined){
+       
+      this.children.map(el => {
+        console.log(elFactory(el));
+        tag.appendChild(elFactory(el))
+      
+      })
+    
+    }
+       return  tag;
+    }
+
+  }
+
+  const res = newtree(obj3, null,0)
+
+
+
+  document.getElementById("root").appendChild(res.draw());
